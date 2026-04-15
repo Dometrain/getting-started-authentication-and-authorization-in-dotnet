@@ -1,0 +1,201 @@
+﻿@model StartcodeAuthentication.Features.User.UserInfoModel
+@{
+    ViewData["Title"] = "User Information";
+}
+
+<h2>User Info</h2>
+<p>This page displays what we know about the current user:</p>
+
+<h5>Identity</h5>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th class="col-md-2">Property</th>
+            <th class="col-md-10">Value</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>IsAuthenticated</td>
+            <td>@(Model.IsAuthenticated ?? false)</td>
+        </tr>
+        <tr>
+            <td>AuthenticationType</td>
+            <td>@(Model.AuthenticationType ?? "[Unknown]")</td>
+        </tr>
+        <tr>
+            <td>Name</td>
+            <td>@(Model.Name ?? "[Unknown]")</td>
+        </tr>
+        <tr>
+            <td>IsDeveloper</td>
+            <td>@(Model.IsDeveloper)</td>
+        </tr>
+        <tr>
+            <td>IsAdmin</td>
+            <td>@(Model.IsAdmin)</td>
+        </tr>
+        <tr>
+            <td>DefaulNameClaimType</td>
+            <td>@(Model.DefaultNameClaimType ?? "[Unknown]")</td>
+        </tr>
+        <tr>
+            <td>DefaultRoleClaimType</td>
+            <td>@(Model.DefaultRoleClaimType ?? "[Unknown]")</td>
+        </tr>
+    </tbody>
+</table>
+
+<br />
+<h5>Claims</h5>
+@if (Model.Claims != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th class="col-md-2">Type</th>
+                <th class="col-md-10">Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var claim in Model.Claims)
+            {
+                <tr>
+                    <td>@claim.Type</td>
+                    <td>@claim.Value</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+
+
+@{
+    var schemeProvider = Context.RequestServices.GetRequiredService<Microsoft.AspNetCore.Authentication.IAuthenticationSchemeProvider>();
+    var allSchemes = await schemeProvider.GetAllSchemesAsync();
+}
+
+@if (allSchemes.Any())
+{
+    <br />
+    <br />
+    <h5>Registered Authentication Schemes</h5>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th class="col-md-4">Scheme Name</th>
+                <th class="col-md-6">Display Name</th>
+                <th class="col-md-2">Handler Type</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var scheme in allSchemes)
+            {
+                <tr>
+                    <td><code>@scheme.Name</code></td>
+                    <td>@(scheme.DisplayName ?? "[No Display Name]")</td>
+                    <td><small class="text-muted">@scheme.HandlerType.Name</small></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+
+
+
+@using Microsoft.AspNetCore.Authentication
+@{
+    // Get authentication properties
+    var authResult = await Context.AuthenticateAsync();
+    var authProperties = authResult?.Properties;
+}
+
+<br />
+<h5>Authentication Properties</h5>
+@if (authProperties != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th class="col-md-3">Property</th>
+                <th class="col-md-9">Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>IsPersistent</td>
+                <td>@authProperties.IsPersistent</td>
+            </tr>
+            <tr>
+                <td>RedirectUri</td>
+                <td>@(authProperties.RedirectUri ?? "[Not Set]")</td>
+            </tr>
+            <tr>
+                <td>IssuedUtc</td>
+                <td>@(authProperties.IssuedUtc?.ToString("yyyy-MM-dd HH:mm:ss UTC") ?? "[Not Set]")</td>
+            </tr>
+            <tr>
+                <td>ExpiresUtc</td>
+                <td>@(authProperties.ExpiresUtc?.ToString("yyyy-MM-dd HH:mm:ss UTC") ?? "[Not Set]")</td>
+            </tr>
+            <tr>
+                <td>AllowRefresh</td>
+                <td>@(authProperties.AllowRefresh?.ToString() ?? "[Not Set]")</td>
+            </tr>
+        </tbody>
+    </table>
+
+    @if (authProperties.Items.Any())
+    {
+        <h6>Custom Items</h6>
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th class="col-md-4">Key</th>
+                    <th class="col-md-8">Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in authProperties.Items)
+                {
+                    <tr>
+                        <td><code>@item.Key</code></td>
+                        <td>@item.Value</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    @if (authProperties.Parameters.Any())
+    {
+        <h6>Parameters</h6>
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th class="col-md-4">Key</th>
+                    <th class="col-md-8">Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var param in authProperties.Parameters)
+                {
+                    <tr>
+                        <td><code>@param.Key</code></td>
+                        <td>@(param.Value?.ToString() ?? "[Null]")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+else
+{
+    <p><em>No authentication properties available (user may not be authenticated or using a scheme that doesn't support properties)</em></p>
+}

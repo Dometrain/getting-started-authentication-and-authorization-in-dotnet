@@ -1,0 +1,126 @@
+﻿@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http.Metadata
+@using Microsoft.AspNetCore.Mvc.Controllers
+@using Microsoft.AspNetCore.Mvc.Filters
+@using Microsoft.AspNetCore.Routing
+
+@{
+    var endpoint = Context.GetEndpoint();
+}
+
+<div class="card mt-4">
+    <div class="card-header">
+        <strong>Endpoint debug</strong>
+    </div>
+
+    <div class="card-body">
+        @if (endpoint is null)
+        {
+            <div class="alert alert-warning mb-0">No endpoint selected for this request.</div>
+        }
+        else
+        {
+            var routeEndpoint = endpoint as RouteEndpoint;
+            var routePattern = routeEndpoint?.RoutePattern?.RawText ?? "(not a RouteEndpoint)";
+            var httpMeta = endpoint.Metadata.GetMetadata<IHttpMethodMetadata>();
+            var methods = httpMeta?.HttpMethods != null ? string.Join(", ", httpMeta.HttpMethods) : "(any)";
+
+            <div class="row">
+                <div class="col-md-5">
+                    <h5 class="mb-3">General</h5>
+                    <dl class="row">
+                        <dt class="col-sm-5">Display name</dt>
+                        <dd class="col-sm-7"><code>@endpoint.DisplayName</code></dd>
+
+                        <dt class="col-sm-5">Route pattern</dt>
+                        <dd class="col-sm-7"><code>@routePattern</code></dd>
+
+                        <dt class="col-sm-5">HTTP methods</dt>
+                        <dd class="col-sm-7"><code>@methods</code></dd>
+                    </dl>
+
+                    @* For MVC actions show controller/action + route values *@
+                    @{
+                        var cad = endpoint.Metadata.GetMetadata<ControllerActionDescriptor>();
+                        if (cad != null)
+                        {
+                            <h6 class="mt-4">MVC action</h6>
+                            <dl class="row">
+                                <dt class="col-sm-5">Controller</dt>
+                                <dd class="col-sm-7">@cad.ControllerName</dd>
+
+                                <dt class="col-sm-5">Action</dt>
+                                <dd class="col-sm-7">@cad.ActionName</dd>
+
+                                <dt class="col-sm-5">Method</dt>
+                                <dd class="col-sm-7"><code>@cad.MethodInfo.DeclaringType?.Name.@cad.MethodInfo.Name</code></dd>
+                            </dl>
+                        }
+                    }
+                </div>
+
+                <div class="col-md-7">
+                    <h5 class="mb-3">Metadata</h5>
+                    <table class="table table-sm table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th style="width: 35%">Type</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var meta in endpoint.Metadata)
+                            {
+                                <tr>
+                                    <td><code>@meta.GetType().Name</code></td>
+                                    <td>
+                                        @switch (meta)
+                                        {
+                                            // AuthN/AuthZ goodies
+                                            case Microsoft.AspNetCore.Authorization.AuthorizeAttribute a:
+                                                <b><text>[Authorize] Roles=<code>@a.Roles</code>, Policy=<code>@a.Policy</code>, Schemes=<code>@a.AuthenticationSchemes</code></text></b>
+                                                break;
+
+                                            case Microsoft.AspNetCore.Authorization.IAuthorizeData ad:
+                                                // Covers custom attributes implementing IAuthorizeData
+                                                <text>IAuthorizeData Roles=<code>@ad.Roles</code>, Policy=<code>@ad.Policy</code>, Schemes=<code>@ad.AuthenticationSchemes</code></text>
+                                                break;
+
+                                            case Microsoft.AspNetCore.Authorization.AllowAnonymousAttribute:
+                                                <b><text>[AllowAnonymous]</text></b>
+                                                break;
+
+                                            // Routing and HTTP
+                                            case IHttpMethodMetadata hm:
+                                                <text>HTTP methods: <code>@string.Join(", ", hm.HttpMethods)</code>; Accepts CORS Preflight: @hm.AcceptCorsPreflight</text>
+                                                break;
+
+                                            case IEndpointNameMetadata nm:
+                                                <text>Endpoint name: <code>@nm.EndpointName</code></text>
+                                                break;
+
+                                            // MVC bits
+                                            case ControllerActionDescriptor cad2:
+                                                <text>Controller=<code>@cad2.ControllerName</code>, Action=<code>@cad2.ActionName</code>, Method=<code>@cad2.MethodInfo.Name</code></text>
+                                                break;
+
+                                            case IFilterMetadata:
+                                                <text>MVC filter: <code>@meta.GetType().Name</code></text>
+                                                break;
+
+                                            // Fallback
+                                            default:
+                                                <text>@meta.ToString()</text>
+                                                break;
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+    </div>
+</div>

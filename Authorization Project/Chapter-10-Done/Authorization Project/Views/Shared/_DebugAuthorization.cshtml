@@ -1,0 +1,135 @@
+﻿@* Views/Shared/_PolicyCacheDebug.cshtml *@
+@using System.Reflection
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Authorization.Infrastructure
+@using Microsoft.AspNetCore.Authorization.Policy
+
+@{
+    var endpoint = Context.GetEndpoint();
+
+    // 1) Get the assembly + type from your custom namespace
+    var authAsm = typeof(IPolicyEvaluator).Assembly;
+    var cacheType = authAsm.GetType("Microsoft.AspNetCore.Authorization.Policy.AuthorizationPolicyCache");
+
+    object? cacheInstance = null;
+    MethodInfo? lookupMethod = null;
+    AuthorizationPolicy? policy = null;
+
+    if (cacheType != null)
+    {
+        // 2) Resolve cache from DI
+        cacheInstance = Context.RequestServices.GetService(cacheType);
+
+        // 3) Lookup(endpoint)
+        lookupMethod = cacheType.GetMethod("Lookup", BindingFlags.Instance | BindingFlags.Public);
+        if (cacheInstance != null && lookupMethod != null && endpoint != null)
+        {
+            policy = lookupMethod.Invoke(cacheInstance, new object?[] { endpoint }) as AuthorizationPolicy;
+        }
+    }
+
+    var schemes = policy?.AuthenticationSchemes?.Any() == true
+        ? string.Join(", ", policy.AuthenticationSchemes)
+        : "(none)";
+}
+
+<div class="card mt-4">
+    <div class="card-header">
+        <strong>Authorization Policy</strong>
+    </div>
+
+    <div class="card-body">
+        @if (cacheType is null)
+        {
+            <div class="alert alert-warning mb-0">
+                Type <code>Microsoft.AspNetCore.MyAuthorization.Policy.AuthorizationPolicyCache</code> not found.
+            </div>
+        }
+        else if (cacheInstance is null)
+        {
+            <div class="alert alert-warning mb-0">
+                AuthorizationPolicyCache not registered in DI.
+            </div>
+        }
+        else if (lookupMethod is null)
+        {
+            <div class="alert alert-warning mb-0">
+                Public method <code>Lookup(Endpoint)</code> not found on AuthorizationPolicyCache.
+            </div>
+        }
+        else if (endpoint is null)
+        {
+            <div class="alert alert-warning mb-0">No endpoint for this request.</div>
+        }
+        else if (policy is null)
+        {
+            <div class="alert alert-info mb-0">No cached authorization policy for this endpoint.</div>
+        }
+        else
+        {
+            <dl class="row">
+                <dt class="col-sm-4">Schemes</dt>
+                <dd class="col-sm-8"><code>@schemes</code></dd>
+
+                <dt class="col-sm-4">Requirement count</dt>
+                <dd class="col-sm-8">@policy.Requirements.Count</dd>
+            </dl>
+
+            <table class="table table-sm table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th style="width: 55%">Requirement</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var req in policy.Requirements)
+                    {
+                        <tr>
+                            <td>
+                                @switch (req)
+                                {
+                                    case DenyAnonymousAuthorizationRequirement r:
+                                        // Requires an authenticated user
+                                        <text><code>@r.GetType().Name</code> — @r.ToString()</text>
+                                        break;
+
+                                    case RolesAuthorizationRequirement r:
+                                        var roles = r.AllowedRoles?.Any() == true ? string.Join(", ", r.AllowedRoles) : "(none)";
+                                        <text><code>@r.GetType().Name</code> — Roles: <code>@roles</code></text>
+                                        break;
+
+                                    case ClaimsAuthorizationRequirement r:
+                                        var values = r.AllowedValues?.Any() == true ? string.Join(", ", r.AllowedValues) : "(any value)";
+                                        <text>
+                                            <code>@r.GetType().Name</code> — ClaimType: <code>@r.ClaimType</code>,
+                                            Values: <code>@values</code>,
+                                        </text>
+                                        break;
+
+                                    case NameAuthorizationRequirement r:
+                                        var required = string.IsNullOrEmpty(r.RequiredName) ? "(any)" : r.RequiredName;
+                                        <text><code>@r.GetType().Name</code> — RequiredName: <code>@required</code></text>
+                                        break;
+
+                                    case AssertionRequirement r:
+                                        <text><code>@r.GetType().Name</code> — Assertion requirement</text>
+                                        break;
+
+                                    case OperationAuthorizationRequirement r:
+                                        <text><code>@r.GetType().Name</code> — Operation: <code>@(r.Name ?? "(unnamed)")</code></text>
+                                        break;
+
+                                    default:
+                                        // Fallback: show full type + ToString()
+                                        <text><code>@req.GetType().FullName</code> — @req.ToString()</text>
+                                        break;
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>

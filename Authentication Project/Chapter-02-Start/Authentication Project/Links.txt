@@ -1,0 +1,70 @@
+Links to useful resources
+#########################
+
+.NET Source Browser
+-------------------
+https://source.dot.net/
+
+
+
+ClaimsPrincipal
+---------------
+ClaimsPrincipal - Source Code
+https://source.dot.net/#System.Security.Claims/System/Security/Claims/ClaimsPrincipal.cs
+
+ClaimsPrincipal - Documentation
+https://learn.microsoft.com/en-us/dotnet/api/system.security.claims.claimsprincipal?
+
+ClaimsPrincipal.Claims
+https://source.dot.net/#System.Security.Claims/System/Security/Claims/ClaimsPrincipal.cs,216
+
+
+ClaimsIdentity
+--------------
+ClaimsIdentity - Source Code
+https://source.dot.net/#System.Security.Claims/System/Security/Claims/ClaimsIdentity.cs
+
+ClaimsIdentity - Documentation
+https://learn.microsoft.com/en-us/dotnet/api/system.security.claims.claimsidentity
+
+ClaimsIdentity.IsAuthenticated
+https://source.dot.net/#System.Security.Claims/System/Security/Claims/ClaimsIdentity.cs,322
+
+ClaimsIdentity.Name
+https://source.dot.net/#System.Security.Claims/System/Security/Claims/ClaimsIdentity.cs,422
+
+Internals
+---------
+AuthenticationProperties - Source Code
+https://github.com/dotnet/aspnetcore/blob/main/src/Http/Authentication.Abstractions/src/AuthenticationProperties.cs
+
+AuthenticationTicket - Source Code
+https://github.com/dotnet/aspnetcore/blob/main/src/Http/Authentication.Abstractions/src/AuthenticationTicket.cs
+
+Cookie Handler
+--------------
+Cookie Handler - Source Code
+https://github.com/dotnet/aspnetcore/tree/main/src/Security/Authentication/Cookies/src
+
+CookieAuthenticationEvents - Source Code
+https://github.com/dotnet/aspnetcore/blob/main/src/Security/Authentication/Cookies/src/CookieAuthenticationEvents.cs
+
+
+Tools:
+------
+Base64 Decode and Encode
+https://www.base64decode.org/ 
+
+
+Blog posts:
+-----------
+Improving ASP.NET Core Security By Putting Your Cookies On A Diet
+https://nestenius.se/net/improving-asp-net-core-security-by-putting-your-cookies-on-a-diet/
+
+
+Security:
+----------
+Unvalidated Redirects and Forwards Cheat Sheet
+https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html
+
+

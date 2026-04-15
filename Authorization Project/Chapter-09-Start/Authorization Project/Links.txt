@@ -1,0 +1,15 @@
+Links to useful resources
+#########################
+
+
+Security:
+----------
+OWASP Top 10:2025
+https://owasp.org/Top10/2025/
+
+Preventing mass assignment or over posting in ASP.NET Core
+https://andrewlock.net/preventing-mass-assignment-or-over-posting-in-asp-net-core/
+
+Mass Assignment Cheat Sheet
+https://cheatsheetseries.owasp.org/cheatsheets/Mass_Assignment_Cheat_Sheet.html 
+

@@ -1,0 +1,21 @@
+﻿@model StartcodeAuthorization.Features.UserProfile.UpdateUserModel
+@{
+    ViewData["Title"] = "UpdateUser";
+}
+
+<h1>UpdateUser</h1>
+
+<form method="post" action="/UserProfile/updateuser">
+    <div class="form-group">
+        <label asp-for="Name" class="control-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <br />
+    <br />
+    <button type="submit" class="btn btn-primary">Update</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

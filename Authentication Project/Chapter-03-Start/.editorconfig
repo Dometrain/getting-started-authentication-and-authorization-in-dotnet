@@ -1,0 +1,8 @@
+[*.cs]
+
+# IDE0290: Use primary constructor
+dotnet_diagnostic.IDE0290.severity = silent
+dotnet_diagnostic.IDE0305.severity = silent
+dotnet_diagnostic.IDE0306.severity = silent
+dotnet_diagnostic.IDE0028.severity = silent
+dotnet_diagnostic.CA1862.severity = silent

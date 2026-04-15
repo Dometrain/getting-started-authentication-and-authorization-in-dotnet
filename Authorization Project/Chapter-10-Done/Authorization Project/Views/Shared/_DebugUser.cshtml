@@ -1,0 +1,134 @@
+﻿@using System.Security.Claims
+@using Microsoft.AspNetCore.Authentication
+
+@{
+    var user = User;
+    var isAuth = user?.Identity?.IsAuthenticated == true;
+
+    // Roles can be ClaimTypes.Role or "role" (OIDC/JWT)
+    var roles = user?.Claims
+        .Where(c => c.Type == ClaimTypes.Role || c.Type == "role")
+        .Select(c => c.Value)
+        .Distinct()
+        .OrderBy(x => x)
+        .ToList() ?? new List<string>();
+
+    // Try to read auth properties from the default scheme
+    var authResult = await Context.AuthenticateAsync();
+    var props = authResult?.Properties;
+    var tokens = props?.GetTokens() ?? Array.Empty<AuthenticationToken>();
+}
+
+<div class="card mt-4">
+    <div class="card-header">
+        <strong>User debug</strong>
+    </div>
+
+    <div class="card-body">
+        <h5 class="mb-3">Authentication status</h5>
+
+        @if(isAuth)
+        {
+            <div class="alert alert-success"><strong>✓ Authenticated</strong></div>
+
+            <dl class="row">
+                <dt class="col-sm-4">Name</dt>
+                <dd class="col-sm-8">@((user?.Identity?.Name) ?? "n/a")</dd>
+
+                <dt class="col-sm-4">Authentication type</dt>
+                <dd class="col-sm-8">@((user?.Identity?.AuthenticationType) ?? "unknown")</dd>
+
+                <dt class="col-sm-4">Roles</dt>
+                <dd class="col-sm-8">
+                    @(roles.Any() ? string.Join(", ", roles) : "none")
+                </dd>
+            </dl>
+
+            @* Identities and their claims *@
+            @if (user != null)
+            {
+                <h5 class="mt-4">Identities</h5>
+                @foreach (var id in user.Identities)
+                {
+                    var idClaims = id.Claims.ToList();
+                    <div class="mb-3">
+                        <div class="small text-muted">
+                            AuthType: <code>@(id.AuthenticationType ?? "unknown")</code>,
+                            IsAuthenticated: <code>@id.IsAuthenticated</code>,
+                        </div>
+
+                        @if (idClaims.Any())
+                        {
+                            <table class="table table-sm table-striped mt-2">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 35%">Type</th>
+                                        <th>Value</th>
+                                        <th style="width: 20%">Issuer</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var claim in idClaims.OrderBy(c => c.Type).ThenBy(c => c.Value))
+                                    {
+                                        <tr>
+                                            <td><code>@claim.Type</code></td>
+                                            <td>@claim.Value</td>
+                                            <td><small class="text-muted">@claim.Issuer</small></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <div class="text-muted"><em>No claims</em></div>
+                        }
+                    </div>
+                }
+            }
+
+            @* Authentication properties (cookies, OpenID Connect, JWT, etc.) *@
+            <h5 class="mt-4">Authentication properties</h5>
+            <dl class="row">
+                <dt class="col-sm-4">Issued</dt>
+                <dd class="col-sm-8">@((props?.IssuedUtc?.ToString("u")) ?? "n/a")</dd>
+
+                <dt class="col-sm-4">Expires</dt>
+                <dd class="col-sm-8">@((props?.ExpiresUtc?.ToString("u")) ?? "n/a")</dd>
+
+                <dt class="col-sm-4">Is persistent</dt>
+                <dd class="col-sm-8">@((props?.IsPersistent == true) ? "yes" : "no")</dd>
+
+                <dt class="col-sm-4">RedirectUri</dt>
+                <dd class="col-sm-8">@((props?.RedirectUri) ?? "n/a")</dd>
+            </dl>
+
+            @if (tokens.Any())
+            {
+                <h6 class="mt-3">Tokens</h6>
+                <table class="table table-sm table-hover">
+                    <thead>
+                        <tr>
+                            <th style="width: 30%">Name</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var t in tokens)
+                        {
+                            <tr>
+                                <td><code>@t.Name</code></td>
+                                <td class="text-break">@t.Value</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        }
+        else
+        {
+            <div class="alert alert-warning"><strong>⚠ Not authenticated</strong></div>
+            <p class="mb-0">You are not currently authenticated.</p>
+        }
+    </div>
+</div>

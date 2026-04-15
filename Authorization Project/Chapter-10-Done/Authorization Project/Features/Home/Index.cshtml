@@ -1,0 +1,44 @@
+﻿@using Microsoft.AspNetCore.Authorization
+@using StartcodeAuthorization.Infrastructure.Attributes
+@inject IAuthorizationService AuthorizationService
+
+@{
+    ViewData["Title"] = "Home Page";
+
+       var showFinanceLink = (await AuthorizationService.AuthorizeAsync(user: User, policyName: Policies.Finance)).Succeeded;
+}
+
+
+<h1>Authorization Application</h1>
+
+
+@if (showFinanceLink)
+{
+    <a href="/Secure/Finance">Finance page</a> @: (finance role)
+    <br />
+}
+
+@if ((await AuthorizationService.AuthorizeAsync(user: User, policyName: Policies.Sales)).Succeeded)
+{
+    <a href="/Secure/Sales">Sales</a> @:(Sales or management role)
+    <br />
+}
+
+
+@if ((await AuthorizationService.AuthorizeAsync(user: User, policyName: Policies.Admin)).Succeeded)
+{
+    <a href="/Secure/Admin">Admin page</a> @:(admin and management role)
+    <br />
+}
+
+@* Unnecessary to call the authorization service for this check *@
+@if (User.Identity?.IsAuthenticated == true)
+{
+    <a href="/Secure/Support">Support</a> @:(Authenticated users)
+    <br />
+}
+
+<a href="/Secure/Contact">Contact us</a> (Anonymous)
+<br />
+
+

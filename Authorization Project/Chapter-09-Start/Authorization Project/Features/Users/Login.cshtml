@@ -1,0 +1,90 @@
+﻿@{
+    ViewData["Title"] = "Login";
+}
+
+<h1>Login</h1>
+
+<div class="card">
+    <div class="card-header">
+        <h4>Login User</h4>
+    </div>
+    <div class="card-body">
+        <p class="mb-3">Choose a test user to login as:</p>
+        <div class="row g-1">
+            <div class="col-md-6 col-lg-4">
+                <form action="/Users/Login" method="post" class="d-grid">
+                    <input type="hidden" name="id" value="1" />
+                    <button type="submit" class="btn btn-success btn-lg">
+                        <i class="fas fa-user"></i> Login as Alice (Customer)
+                    </button>
+                </form>
+                <small class="text-muted">UserID: 1, Roles: None</small>
+            </div>
+        </div>
+        <br />
+        <div class="row g-1">
+            <br />
+            <div class="col-md-6 col-lg-4">
+                <form action="/Users/Login" method="post" class="d-grid">
+                    <input type="hidden" name="id" value="2" />
+                    <button type="submit" class="btn btn-success btn-lg">
+                        <i class="fas fa-user"></i> Login as Bob (Customer)
+                    </button>
+                </form>
+                <small class="text-muted">UserID: 2, Roles: None</small>
+            </div>
+        </div>
+        <br />
+        <div class="row g-1">
+            <br />
+            <div class="col-md-6 col-lg-4">
+                <form action="/Users/Login" method="post" class="d-grid">
+                    <input type="hidden" name="id" value="3" />
+                    <button type="submit" class="btn btn-success btn-lg">
+                        <i class="fas fa-user"></i> Login as Finance
+                    </button>
+                </form>
+                <small class="text-muted">UserID: 3, Roles: finance</small>
+            </div>
+        </div>
+        <br />
+        <div class="row g-1">
+            <br />
+            <div class="col-md-6 col-lg-4">
+                <form action="/Users/Login" method="post" class="d-grid">
+                    <input type="hidden" name="id" value="4" />
+                    <button type="submit" class="btn btn-success btn-lg">
+                        <i class="fas fa-user"></i> Login as Sales
+                    </button>
+                </form>
+                <small class="text-muted">UserID: 4, Roles: sales</small>
+            </div>
+        </div>
+        <br />
+        <div class="row g-1">
+            <br />
+            <div class="col-md-6 col-lg-4">
+                <form action="/Users/Login" method="post" class="d-grid">
+                    <input type="hidden" name="id" value="5" />
+                    <button type="submit" class="btn btn-success btn-lg">
+                        <i class="fas fa-user"></i> Login as Manager
+                    </button>
+                </form>
+                <small class="text-muted">UserID: 5, Roles: management, admin</small>
+            </div>
+        </div>
+        <br />
+        <div class="row g-1">
+            <br />
+            <div class="col-md-6 col-lg-4">
+                <form action="/Users/Login" method="post" class="d-grid">
+                    <input type="hidden" name="id" value="6" />
+                    <button type="submit" class="btn btn-success btn-lg">
+                        <i class="fas fa-user"></i> Login as Admin
+                    </button>
+                </form>
+                <small class="text-muted">UserID: 6, Roles: admin</small>
+            </div>
+        </div>
+    </div>
+</div>
