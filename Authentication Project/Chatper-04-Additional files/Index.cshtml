@@ -1,0 +1,137 @@
+﻿@{
+    ViewData["Title"] = "Authentication Test";
+}
+
+<div class="container mt-4">
+    <h2>Authentication Test Page</h2>
+
+    <!-- Authentication Status Display -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4>Authentication Status</h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <strong>Authenticated:</strong>
+                    <span class="badge @(ViewBag.IsAuthenticated ? "bg-success" : "bg-danger")">
+                        @(ViewBag.IsAuthenticated ? "Yes" : "No")
+                    </span>
+                </div>
+                <div class="col-md-6">
+                    <strong>Username:</strong>
+                    <span class="text-info">@ViewBag.Username</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Messages Display -->
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            @TempData["Message"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Authentication Action Buttons -->
+    <div class="card">
+        <div class="card-header">
+            <h4>Authentication Actions</h4>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6 col-lg-4">
+                    <form action="/AuthTest/AuthenticateUser" method="post" class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-check-circle"></i> Authenticate
+                        </button>
+                    </form>
+                    <small class="text-muted">Check authentication status</small>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <form action="/AuthTest/ChallengeUser" method="post" class="d-grid">
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-key"></i> Challenge
+                        </button>
+                    </form>
+                    <small class="text-muted">Trigger authentication challenge</small>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <form action="/AuthTest/SignInUser" method="post" class="d-grid">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-sign-in-alt"></i> Sign In
+                        </button>
+                    </form>
+                    <small class="text-muted">Sign in with test user</small>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <form action="/AuthTest/SignOutUser" method="post" class="d-grid">
+                        <button type="submit" class="btn btn-secondary">
+                            <i class="fas fa-sign-out-alt"></i> Sign Out
+                        </button>
+                    </form>
+                    <small class="text-muted">Sign out current user</small>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <form action="/AuthTest/Forbidden" method="post" class="d-grid">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-ban"></i> Forbid
+                        </button>
+                    </form>
+                    <small class="text-muted">Trigger access denied</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Claims Display (if authenticated) -->
+    @if (ViewBag.IsAuthenticated)
+    {
+        <div class="card mt-4">
+            <div class="card-header">
+                <h4>User Claims</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Claim Type</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var claim in User.Claims)
+                            {
+                                <tr>
+                                    <td><code>@claim.Type</code></td>
+                                    <td>@claim.Value</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .card {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+
+    .btn {
+        margin-bottom: 0.5rem;
+    }
+
+    .badge {
+        font-size: 0.9em;
+    }
+</style>
